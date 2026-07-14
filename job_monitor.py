@@ -28,23 +28,32 @@ def save_jobs(jobs):
         json.dump(list(jobs), f, ensure_ascii=False, indent=2)
 
 
+from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
+
+
 def get_jobs():
-    headers = {
-        "User-Agent": "Mozilla/5.0"
-    }
-
-    response = requests.get(URL, headers=headers, timeout=30)
-    response.raise_for_status()
-
-    print("HTTP status:", response.status_code)
-    print("HTML length:", len(response.text))
-
-    with open("debug.html", "w", encoding="utf-8") as f:
-        f.write(response.text)
-
-    soup = BeautifulSoup(response.text, "html.parser")
 
     jobs = set()
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+
+        page = browser.new_page(
+            user_agent="Mozilla/5.0"
+        )
+
+        page.goto(
+            URL,
+            wait_until="networkidle",
+            timeout=60000
+        )
+
+        html = page.content()
+
+        browser.close()
+
+    soup = BeautifulSoup(html, "html.parser")
 
     for link in soup.find_all("a", href=True):
         href = link["href"]
@@ -55,7 +64,7 @@ def get_jobs():
 
             jobs.add(href)
 
-    print("Found jobs:", len(jobs))
+    print(f"Found jobs: {len(jobs)}")
 
     return jobs
 
