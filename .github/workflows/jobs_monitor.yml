@@ -22,13 +22,13 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install browser
-        run: |
-          playwright install chromium
-
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
+
+      - name: Install browser
+        run: |
+          python -m playwright install chromium
 
       - name: Run monitor
         env:
