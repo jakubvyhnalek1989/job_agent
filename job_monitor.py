@@ -36,11 +36,16 @@ def get_jobs():
     response = requests.get(URL, headers=headers, timeout=30)
     response.raise_for_status()
 
+    print("HTTP status:", response.status_code)
+    print("HTML length:", len(response.text))
+
+    with open("debug.html", "w", encoding="utf-8") as f:
+        f.write(response.text)
+
     soup = BeautifulSoup(response.text, "html.parser")
 
     jobs = set()
 
-    # StartupJobs používá odkazy na jednotlivé nabídky
     for link in soup.find_all("a", href=True):
         href = link["href"]
 
@@ -49,6 +54,8 @@ def get_jobs():
                 href = "https://www.startupjobs.cz" + href
 
             jobs.add(href)
+
+    print("Found jobs:", len(jobs))
 
     return jobs
 
