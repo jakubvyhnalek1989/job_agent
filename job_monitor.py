@@ -1,7 +1,6 @@
 import os
 import json
 import smtplib
-import requests
 from bs4 import BeautifulSoup
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
